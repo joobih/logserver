@@ -39,13 +39,13 @@ class LogServer(RQConsumer):
     def write(self,data):
         logger = self.loggers[data["log_name"]]
         if data["level"] == "info":
-            logger.info(data["msg"])
+            logger.info(data["logs"])
         if data["level"] == "error":
-            logger.error(data["msg"])
+            logger.error(data["logs"])
         if data["level"] == "debug":
-            logger.debug(data["msg"])
+            logger.debug(data["logs"])
         if data["level"] == "warn":
-            logger.warn(data["msg"])
+            logger.warn(data["logs"])
 
     def get_handler(self,log_name):
         logger = logging.getLogger(log_name)
