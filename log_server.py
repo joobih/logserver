@@ -58,6 +58,12 @@ class LogServer(RQConsumer):
         return logger
 
 if __name__ == "__main__":
+    #判断有没有文件夹logs，没有就创建
+    if os.path.exists("./logs"):
+        print "logs exist"
+    else:
+        print "mkdir logs"
+        os.makedirs("logs")
     conf = ConfigParser.ConfigParser()
     conf.read("setting.conf")
     rq_host = conf.get("rabbitmq","host")
