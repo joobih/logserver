@@ -9,6 +9,10 @@ import json
 import ConfigParser
 from Common.queues.rb_consumer import RQConsumer,TestConsumer
 
+"""
+    一个队列代表一个项目日志所有的归属地，一个项目下面可能会有很多server，
+    每一个server通过唯一标识的server_name当做log_name ，这样就会将每个server区分存放到不同的日志文件下面
+"""
 class LogServer(RQConsumer):
     
     def __init__(self,rq_queue,rq_host="127.0.0.1",rq_port=5672,kwags={}):
@@ -50,7 +54,7 @@ class LogServer(RQConsumer):
     def get_handler(self,log_name):
         logger = logging.getLogger(log_name)
         logger.setLevel(logging.DEBUG)
-        fh = logging.FileHandler("logs/{}.log".format(log_name))
+        fh = logging.FileHandler("{}/{}.log".format(self.queue,log_name))
         fh.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
@@ -58,16 +62,16 @@ class LogServer(RQConsumer):
         return logger
 
 if __name__ == "__main__":
-    #判断有没有文件夹logs，没有就创建
-    if os.path.exists("./logs"):
-        print "logs exist"
-    else:
-        print "mkdir logs"
-        os.makedirs("logs")
     conf = ConfigParser.ConfigParser()
     conf.read("setting.conf")
     rq_host = conf.get("rabbitmq","host")
     rq_port = conf.get("rabbitmq","port")
     rq_queue = conf.get("rabbitmq","queue")
+    #判断有没有文件夹logs，没有就创建
+    if os.path.exists(rq_queue):
+        print "dir {} exist".format(rq_queue)
+    else:
+        print "mkdir {}".format(rq_queue)
+        os.makedirs(rq_queue)
     TestConsumer(LogServer,rq_queue,rq_host,rq_port,{})
 
